@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import json
+import parser
 import psycopg2
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -7,12 +8,17 @@ from datetime import datetime
 from db import close_db
 from flask import Flask
 from scraper import flights
+from scraper.scraper import scrape_flight_informations
 
 #################################################################
 
 def load_config(path):
     with open(path) as f:
         return json.load(f)
+
+config = load_config('../resources/config.json')
+
+#################################################################
 
 def create_app(config):
     app = Flask(__name__, instance_relative_config=True)
@@ -22,12 +28,9 @@ def create_app(config):
 
     return app
 
-config = load_config('../resources/config.json')
 app = create_app(config)
 
 #################################################################
-
-from scraper.scraper import scrape_flight_informations
 
 def schedule_jobs(config):
     scheduler = BackgroundScheduler()
@@ -49,10 +52,12 @@ def schedule_jobs(config):
                                 to_date,
                                 fmi['departure_station'],
                                 fmi['arrival_station']],
-                          minutes=1)
+                          minutes=60)
 
     scheduler.start()
 
-schedule_jobs(config)
+    return scheduler
+
+scheduler = schedule_jobs(config)
 
 #################################################################

@@ -12,9 +12,12 @@ def converter(o):
         return o.__str__()
     return o.__dict__
 
-@bp.route('/cheapest/<departure_station>/<arrival_station>')
-def cheapest(departure_station, arrival_station):
+@bp.route('/cheapest/<departure_station>/<arrival_station>/<date>')
+def cheapest(departure_station, arrival_station, date):
     print('Getting cheapest flights...')
+
+    from_dt = f'{date} 00:00:00'
+    to_dt = f'{date} 23:59:59'
 
     db = get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
@@ -23,11 +26,12 @@ def cheapest(departure_station, arrival_station):
         SELECT *
         FROM flight_info
         WHERE 
-        price = (SELECT MIN(price) FROM flight_info WHERE departure_station = %s AND arrival_station = %s) AND
+        departure_dt BETWEEN %s AND %s AND
+        price = (SELECT MIN(price) FROM flight_info WHERE departure_dt BETWEEN %s AND %s AND departure_station = %s AND arrival_station = %s) AND
         departure_station = %s AND
         arrival_station = %s;
         ''',
-        (departure_station, arrival_station, departure_station, arrival_station)
+        (from_dt, to_dt, from_dt, to_dt, departure_station, arrival_station, departure_station, arrival_station)
     )
 
     flights = cursor.fetchall()
@@ -39,6 +43,9 @@ def cheapest(departure_station, arrival_station):
 def flights(departure_station, arrival_station, date):
     print(f'Getting flights @ {date}...')
 
+    from_dt = f'{date} 00:00:00'
+    to_dt = f'{date} 23:59:59'
+
     db = get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
     cursor.execute(
@@ -49,7 +56,7 @@ def flights(departure_station, arrival_station, date):
         arrival_station = %s AND
         departure_dt BETWEEN %s AND %s;
         ''',
-        (departure_station, arrival_station, f'{date} 00:00:00', f'{date} 23:59:59')
+        (departure_station, arrival_station, from_dt, to_dt)
     )
 
     flights = cursor.fetchall()

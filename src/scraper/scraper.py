@@ -6,6 +6,10 @@ from db import get_db
 from scraper.flight_companies.ryanair import Ryanair
 from scraper.flight_companies.wizzair import Wizzair
 
+columns = ['company', 'query_dt', 'departure_station', 'arrival_station', 'departure_dt', 'arrival_dt', 'price', 'currency']
+insert = f'INSERT INTO flight_info ({", ".join(columns)}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);'
+
+
 def scrape_flight_informations(start_date, end_date, departure_station, arrival_station):
     now = datetime.now()
 
@@ -29,15 +33,7 @@ def scrape_flight_informations(start_date, end_date, departure_station, arrival_
 
     flight_info = ryanair_flight_info + wizzair_flight_info
 
-    for f in flight_info:
-        print(f)
-
-    print('Persisting flight information')
-
-    columns = ['company', 'query_dt', 'departure_station', 'arrival_station', 'departure_dt', 'arrival_dt', 'price', 'currency']
-    insert = f'INSERT INTO flight_info ({", ".join(columns)}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);'
-
-    print(f'INSERT: {insert}')
+    print(f'Persisting {len(ryanair_flight_info)} Ryanair and {len(wizzair_flight_info)} Wizzair flights!')
 
     db = get_db()
     cursor = db.cursor()
