@@ -1,0 +1,7 @@
+{
+  "dbname": "travel-scraper",
+  "user": "scraper",
+  "password": "secret",
+  "host": "db",
+  "port": 5432
+}

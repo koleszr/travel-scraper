@@ -16,23 +16,24 @@ def load_config(path):
     with open(path) as f:
         return json.load(f)
 
-config = load_config('../resources/config.json')
+db_config = load_config('../resources/db_config.json')
+flight_config = load_config('../resources/flight_config.json')
 
 #################################################################
 
-def create_app(config):
+def create_app():
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(DATABASE=config['postgres'])
+    app.config.from_mapping(DATABASE=db_config)
     app.register_blueprint(flights.bp)
     app.teardown_appcontext(close_db)
 
     return app
 
-app = create_app(config)
+app = create_app()
 
 #################################################################
 
-def schedule_jobs(config):
+def schedule_jobs():
     scheduler = BackgroundScheduler()
 
     def job(from_date, to_date, departure_station, arrival_station):
@@ -42,7 +43,7 @@ def schedule_jobs(config):
                                        departure_station, 
                                        arrival_station)
 
-    for fmi in config['flights']:
+    for fmi in flight_config:
         print(f'Scheduling job: {fmi["departure_station"]} -> {fmi["arrival_station"]}, between {fmi["from_date"]} and {fmi["to_date"]}...')
         from_date = datetime.strptime(fmi['from_date'], '%Y-%m-%d').date()
         to_date = datetime.strptime(fmi['to_date'], '%Y-%m-%d').date()
@@ -58,6 +59,6 @@ def schedule_jobs(config):
 
     return scheduler
 
-scheduler = schedule_jobs(config)
+scheduler = schedule_jobs()
 
 #################################################################
