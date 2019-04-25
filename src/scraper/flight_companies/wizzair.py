@@ -45,7 +45,7 @@ class Wizzair():
         dates = [start_date + timedelta(days=dt) for dt in range(days_between + 1)]
         flights = []
         
-        with concurrent.futures.ThreadPoolExecutor(max_workers=days_between) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=days_between+1) as executor:
             flights_future = [executor.submit(self.get_flights_at, api_url, date) for date in dates]
 
             for f in concurrent.futures.as_completed(flights_future):
