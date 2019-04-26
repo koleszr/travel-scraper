@@ -4,7 +4,7 @@ import re
 import requests
 
 from datetime import date, datetime, timedelta
-from common.flight.flight import Flight, Price
+from travel.flight_info import Flight, Price
 
 '''
 Prices between start date and start date + FlexDaysOut

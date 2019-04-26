@@ -1,7 +1,7 @@
 import datetime
 import json
 
-from db import get_db
+from travel.db import get_db
 from flask import Blueprint, jsonify
 from psycopg2.extras import RealDictCursor
 

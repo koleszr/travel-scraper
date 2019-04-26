@@ -5,26 +5,18 @@ import psycopg2
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
-from db import close_db
 from flask import Flask
-from scraper import flights
-from scraper.scraper import scrape_flight_informations
-
-#################################################################
-
-def load_config(path):
-    with open(path) as f:
-        return json.load(f)
-
-db_config = load_config('../resources/db_config.json')
-flight_config = load_config('../resources/flight_config.json')
+from travel.db import close_db
+from travel.flights import bp as flights_blueprint
+from travel.scraper import scrape_flight_informations
 
 #################################################################
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(DATABASE=db_config)
-    app.register_blueprint(flights.bp)
+    app.config.from_json(filename="db_config.json", silent=False)
+    app.config.from_json(filename="flights_config.json", silent=False)
+    app.register_blueprint(flights_blueprint)
     app.teardown_appcontext(close_db)
 
     return app
@@ -43,7 +35,7 @@ def schedule_jobs():
                                        departure_station, 
                                        arrival_station)
 
-    for fmi in flight_config:
+    for fmi in app.config['FLIGHTS']:
         print(f'Scheduling job: {fmi["departure_station"]} -> {fmi["arrival_station"]}, between {fmi["from_date"]} and {fmi["to_date"]}...')
         from_date = datetime.strptime(fmi['from_date'], '%Y-%m-%d').date()
         to_date = datetime.strptime(fmi['to_date'], '%Y-%m-%d').date()

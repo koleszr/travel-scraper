@@ -3,7 +3,7 @@ import json
 import requests
 
 from datetime import date, datetime, timedelta
-from common.flight.flight import Flight, Price
+from travel.flight_info import Flight, Price
 
 class Wizzair():
     def __init__(self, departure_station, arrival_station, adult_count):

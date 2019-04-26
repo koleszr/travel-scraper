@@ -1,10 +1,10 @@
 import time
 
-from common.flight.flight_info import FlightInfo
 from datetime import date, datetime
-from db import get_db
-from scraper.flight_companies.ryanair import Ryanair
-from scraper.flight_companies.wizzair import Wizzair
+from travel.db import get_db
+from travel.flight_companies.ryanair import Ryanair
+from travel.flight_companies.wizzair import Wizzair
+from travel.flight_info import FlightInfo
 
 columns = ['company', 'query_dt', 'departure_station', 'arrival_station', 'departure_dt', 'arrival_dt', 'price', 'currency']
 insert = f'INSERT INTO flight_info ({", ".join(columns)}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);'
