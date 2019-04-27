@@ -6,6 +6,7 @@ import psycopg2
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 from flask import Flask
+from flask_cors import CORS
 from travel.db import close_db
 from travel.flights import bp as flights_blueprint
 from travel.scraper import scrape_flight_informations
@@ -18,6 +19,8 @@ def create_app():
     app.config.from_json(filename="flights_config.json", silent=False)
     app.register_blueprint(flights_blueprint)
     app.teardown_appcontext(close_db)
+
+    CORS(app)
 
     return app
 
