@@ -18,17 +18,17 @@ arrival_station = %s;
 '''
 
 DAILY_CHEAPEST_BETWEEN_QUERY = f'''
-SELECT flight_info.company, flight_info.departure_dt, flight_info.arrival_dt, flight_info.price FROM flight_info
+SELECT f.company, f.departure_dt, f.arrival_dt, f.price, f.currency FROM flight_info AS f
 INNER JOIN (
 SELECT departure_dt::date as ddt, min(price) as mp
 FROM flight_info
 WHERE departure_station = %s AND arrival_station = %s AND departure_dt::date BETWEEN %s AND %s
 GROUP BY departure_dt::date
 ) cheapest
-ON flight_info.departure_dt::date = cheapest.ddt AND flight_info.price = cheapest.mp
-WHERE flight_info.departure_station = %s AND flight_info.arrival_station = %s AND flight_info.departure_dt::date BETWEEN %s AND %s
-GROUP BY flight_info.price, flight_info.departure_dt, flight_info.arrival_dt, flight_info.company
-ORDER BY flight_info.departure_dt;
+ON f.departure_dt::date = cheapest.ddt AND f.price = cheapest.mp
+WHERE f.departure_station = %s AND f.arrival_station = %s AND f.departure_dt::date BETWEEN %s AND %s
+GROUP BY f.price, f.departure_dt, f.arrival_dt, f.company, f.currency
+ORDER BY f.departure_dt;
 '''
 
 FLIGHTS_QUERY = f'''
